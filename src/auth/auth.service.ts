@@ -5,11 +5,10 @@ import * as bcrypt from 'bcryptjs';
 
 
 import { User } from './entities/user.entity';
-import { CreateAuthDto } from './dto/create-user.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { LoginDto } from './dto/login.dto';
+import { CreateUserDTO,LoginDto,RegisterDTO,UpdateAuthDto} from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload';
+import { LoginResponse } from './interfaces/login-response';
 @Injectable()
 export class AuthService {
 
@@ -18,7 +17,7 @@ export class AuthService {
     private jwtService:JwtService
   ){}
 
-  async create(createUserDto: CreateAuthDto):Promise<User>{
+  async create(createUserDto: CreateUserDTO):Promise<User>{
     
     try {
 
@@ -41,8 +40,26 @@ export class AuthService {
 
   }
 
-  async login(loginDto:LoginDto){
+  async register(registerDTO:RegisterDTO):Promise<LoginResponse>{
+    //Validacion de si las contraseñas son iguales
+    if(registerDTO.password!==registerDTO.password2){
+       throw new BadRequestException('Las contraseñas no son iguales');
+    }
+    const userdto:CreateUserDTO={
+      email:registerDTO.email,
+      password:registerDTO.password,
+      name:registerDTO.name
+    }
+    const response=await this.create(userdto);
+    
+    return {
+      user:response,
+      token:await this.getJwtToken({id:response._id})
+    };
 
+  }
+
+  async login(loginDto:LoginDto):Promise<LoginResponse>{
 
     const{email,password}=loginDto;
     const user=await this.userModel.findOne({email});
