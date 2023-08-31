@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
@@ -9,6 +9,7 @@ import { CreateUserDTO,LoginDto,RegisterDTO,UpdateAuthDto} from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload';
 import { LoginResponse } from './interfaces/login-response';
+import { AuthGuard } from './guards/auth.guard';
 @Injectable()
 export class AuthService {
 
@@ -85,8 +86,9 @@ export class AuthService {
      */
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  @UseGuards(AuthGuard)
+  findAll():Promise<User[]> {
+    return this.userModel.find();
   }
 
   findOne(id: number) {
