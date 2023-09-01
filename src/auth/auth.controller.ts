@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards,Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDTO,UpdateAuthDto,LoginDto,RegisterDTO } from './dto';
 import { AuthGuard } from './guards/auth.guard';
@@ -22,8 +22,10 @@ export class AuthController {
   }
   @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.authService.findAll();
+  findAll(@Request() req:Request) {
+    const user=req['user'];
+    // return this.authService.findAll();
+    return user;
   }
 
   @Get(':id')

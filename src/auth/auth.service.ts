@@ -86,9 +86,15 @@ export class AuthService {
      */
   }
 
-  @UseGuards(AuthGuard)
-  findAll():Promise<User[]> {
-    return this.userModel.find();
+  
+  async findAll():Promise<User[]> {
+    return await this.userModel.find();
+  }
+  async findUserById(userId:string){
+    const user=await this.userModel.findById(userId);
+    // Desestructuro para quitar la contraseña
+    const {password, ...rest}=user.toJSON();
+    return rest
   }
 
   findOne(id: number) {
